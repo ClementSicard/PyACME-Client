@@ -38,3 +38,6 @@ Consider the following invocation of run:
 ```run dns01 --dir https://example.com/dir --record 1.2.3.4 --domain example.com --domain test.clementsicard.com```
 
 It should use the ACME server at the URL `https://example.com/dir` and perform the dns-01 challenge. The DNS server of the application will respond with `1.2.3.4` to all requests for A records. Once the certificate has been obtained, your application will start its certificate HTTPS server and install the obtained certificate in this server.
+
+
+(This project was done in the frame of [Network Security 2020 course](https://netsec.ethz.ch/courses/netsec-2020/) at ETH Zurich)
