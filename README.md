@@ -1,5 +1,5 @@
 # PyACME-Client
-Implementation of an ACMEv2 Client in Python. The app was written in Python, using all the non-native libraries present in the `compile` script, which is advised to be run before running the app.
+Implementation of an [RFC8555-ACMEv2](https://tools.ietf.org/pdf/rfc8555.pdf) client in Python. The app was written in Python, using all the non-native libraries present in the `compile` script, which is advised to be run before running the app.
 
 ## Command-line arguments 
 
