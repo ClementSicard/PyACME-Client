@@ -1,0 +1,9 @@
+#!/bin/bash
+echo "Compile your project here"
+/usr/local/bin/python -m pip install --upgrade pip
+pip3 install cryptography
+pip3 install dacite
+pip3 install dnslib
+pip3 install Flask
+pip3 install PyCryptodome
+pip3 install requests

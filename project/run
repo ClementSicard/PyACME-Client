@@ -1,0 +1,104 @@
+#!/bin/bash
+
+DIRECTORY=$(dirname "$0")
+echo "Changing to ${DIRECTORY}"
+cd  "$DIRECTORY" || exit 1
+
+echo "Run your project here."
+
+CHALLENGE=''
+DIR_URL=''
+IPV4_ADDRESS=''
+DOMAIN=()
+REVOKE=0
+
+DIR_F=0
+REC_F=0
+REV_F=0
+
+CHALLENGE=$1
+
+if ! [[ $CHALLENGE == "dns01" || $CHALLENGE == "http01" ]]; then
+    echo "Error: Challenge type not correct : has to be either 'dns01' or 'http01'."
+    exit 1
+else
+    CHALLENGE=$1
+    shift
+fi
+
+while test $# -gt 0; do
+    case "$1" in
+        
+        --dir)
+            if [ $DIR_F == 0 ]; then
+                shift
+                DIR_URL=$1
+                shift
+            else
+                echo "Error: Only one --dir argument can be added."
+                exit 1
+            fi
+            ((DIR_F++))
+        ;;
+        
+        --record)
+            if [ $REC_F == 0 ]; then
+                shift
+                IPV4_ADDRESS=$1
+                shift
+                ((REC_F++))
+            else
+                echo "Error: Only one --record argument can be added."
+                exit 1
+            fi
+        ;;
+        
+        --domain)
+            shift
+            DOMAIN+=($1)
+            shift
+        ;;
+        
+        --revoke)
+            if [ $REV_F == 0 ]; then
+                REVOKE=1
+                shift
+                ((REV_F++))
+            else
+                echo "Error: Only one --revoke argument can be set."
+            fi
+        ;;
+        
+        *)
+            echo "Error: $1 is not correct flag. Please check your arguments."
+            exit 1
+        ;;
+    esac
+done
+
+
+if [  "$DIR_F" -eq "0" ] || [ "$REC_F" -eq "0" ] || [ "${#DOMAIN[@]}" -eq "0" ]; then
+    echo "Error: Invalid arguments."
+    exit 1
+fi
+
+echo ". 60 IN A $IPV4_ADDRESS" > dns_records.txt
+
+
+python3 http-server.py --record $IPV4_ADDRESS &
+python3 dns-server.py --record $IPV4_ADDRESS &
+
+DOMAIN_STR=""
+D="--domain "
+
+for element in "${DOMAIN[@]}"
+do
+    DOMAIN_STR+="${D}${element} "
+done
+
+
+if [  "$REV_F" -eq "0" ]; then
+    python3 -i acme.py $CHALLENGE --dir $DIR_URL --record $IPV4_ADDRESS $DOMAIN_STR
+else
+    python3 acme.py $CHALLENGE --dir $DIR_URL --record $IPV4_ADDRESS $DOMAIN_STR --revoke
+fi
